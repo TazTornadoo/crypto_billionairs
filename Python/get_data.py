@@ -1,4 +1,3 @@
-from mimetypes import encodings_map
 import wget
 from datetime import date, datetime, timedelta
 import os
@@ -52,13 +51,13 @@ def load_data_to_database(path, db_connection, header_list):
             pass
 
 
-def union_tables(trading_pair, db_connection):
+def union_tables(trading_pair, time_interval, db_connection):
 
     table_names = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;", db_connection)
 
     table_names_list = table_names['name'].tolist()
 
-    filtered_table_names = [name for name in table_names_list if trading_pair in name and 'history' not in name]
+    filtered_table_names = [name for name in table_names_list if trading_pair in name and 'history' not in name and time_interval in name]
 
     union_all_sql_list = []
 
@@ -75,10 +74,14 @@ def union_tables(trading_pair, db_connection):
 #Potentially ineffiecent, might be worth trying to use only SQL and not loading into a dataframe first
     df = pd.read_sql_query(union_all_sql, db_connection)
 
-    df.to_sql(f'{trading_pair}_complete_history', con=db_connection, if_exists="replace", index=False)
+    df.to_sql(f'{trading_pair}_{time_interval}_complete_history', con=db_connection, if_exists="replace", index=False)
+    
+
+#def create_rolled_window_dataset(table_name_history, ):   
 
 
-download_binance_data("spot", "daily", "ETHTUSD", "3m", 360, "Data/raw_data", connection)
+
+download_binance_data("spot", "daily", "ETHTUSD", "3m", 450, "Data/raw_data", connection)
 
 header = ['open time', 'open',
           'high', 'low', 'close',
@@ -90,4 +93,4 @@ header = ['open time', 'open',
 
 load_data_to_database('Data/raw_data', connection, header)
 
-union_tables('ETHTUSD', connection)
+union_tables('ETHTUSD', '3m', connection)
