@@ -12,6 +12,12 @@ def download_binance_data(price_type, granularity, trading_pair, time_interval, 
 
     for history_day in range(1, history_days + 1):
 
+        #https://data.binance.vision/?prefix=data/spot/daily/klines/
+        # price type: spot or futures
+        # granularity: daily or monthly
+        # time intervals: 1d, 12h, 8h, 6h, 4h, 2h, 1h, 30m, 15m, 5m, 3m, 1m
+        # history days infinite but max history reaches until 1st of march usually
+
         today = datetime.today() - timedelta(days=history_day)
         date_ = today.strftime("%Y-%m-%d")
         data_file = f"{trading_pair}-{time_interval}-{date_}"
@@ -81,7 +87,7 @@ def union_tables(trading_pair, time_interval, db_connection):
 
 
 
-download_binance_data("spot", "daily", "ETHTUSD", "3m", 450, "Data/raw_data", connection)
+download_binance_data("spot", "daily", "ETHTUSD", "5m", 450, "Data/raw_data", connection)
 
 header = ['open time', 'open',
           'high', 'low', 'close',
@@ -93,4 +99,4 @@ header = ['open time', 'open',
 
 load_data_to_database('Data/raw_data', connection, header)
 
-union_tables('ETHTUSD', '3m', connection)
+union_tables('ETHTUSD', '5m', connection)
