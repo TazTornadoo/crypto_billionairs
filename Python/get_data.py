@@ -87,7 +87,7 @@ def union_tables(trading_pair, time_interval, db_connection):
 
 
 
-download_binance_data("spot", "daily", "ETHTUSD", "5m", 450, "Data/raw_data", connection)
+download_binance_data("spot", "daily", "ETHUSDT", "1d", 450, "Data/raw_data", connection)
 
 header = ['open time', 'open',
           'high', 'low', 'close',
@@ -99,4 +99,4 @@ header = ['open time', 'open',
 
 load_data_to_database('Data/raw_data', connection, header)
 
-union_tables('ETHTUSD', '5m', connection)
+union_tables('ETHUSDT ', '1d', connection)
