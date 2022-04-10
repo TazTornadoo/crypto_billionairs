@@ -64,6 +64,7 @@ def union_tables(trading_pair, time_interval, db_connection):
     table_names_list = table_names['name'].tolist()
 
     filtered_table_names = [name for name in table_names_list if trading_pair in name and 'history' not in name and time_interval in name]
+    
 
     union_all_sql_list = []
 
@@ -87,7 +88,7 @@ def union_tables(trading_pair, time_interval, db_connection):
 
 
 
-download_binance_data("spot", "daily", "ETHUSDT", "5m", 450, "Data/raw_data", connection)
+download_binance_data("spot", "daily", "ETHUSDT", "1h", 450, "Data/raw_data", connection)
 
 header = ['open time', 'open',
           'high', 'low', 'close',
@@ -99,4 +100,4 @@ header = ['open time', 'open',
 
 load_data_to_database('Data/raw_data', connection, header)
 
-union_tables('ETHUSDT ', '5m', connection)
+union_tables('ETHUSDT', '1h', connection)
