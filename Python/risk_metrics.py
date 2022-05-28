@@ -45,7 +45,9 @@ class Risk_Metrics():
                 temporary = self.ohlcv_data[column_name][row['EntryBar']:row['ExitBar']].to_list()
                 short_returns = [2 - x for x in temporary]
 
-                portfolio_returns.extend(short_returns) 
+                portfolio_returns.extend(short_returns)
+        
+        portfolio_returns = [x for x in portfolio_returns if isinstance(x, str) != True]
     
         s = Risk_Metrics._std_dev(portfolio_returns)
     
