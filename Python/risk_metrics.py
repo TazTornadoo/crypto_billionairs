@@ -12,7 +12,20 @@ class Risk_Metrics():
         self.stats = stats
         
     
-    def sharpe_ratio(self, column_name):
+    def _annualize(self, total_return):
+        
+        if total_return < 0:
+            total_return = total_return * -1
+            annualized_return = total_return ** (1 / (len(self.ohlcv_data) / 365 ))
+            
+            annualized_return = annualized_return * -1
+            
+        else:
+            annualized_return = total_return ** (1 / (len(self.ohlcv_data) / 365 ))
+        
+        return annualized_return 
+    
+    def sharpe_ratio(self):
         
         
         portfolio_returns = self.trades["ReturnPct"] + 1
@@ -21,13 +34,16 @@ class Risk_Metrics():
 
         s = statistics.stdev(portfolio_returns)
         
-        sharpe_ratio = (self.stats["Return [%]"] / 100 - self.risk_free_return) / s
+        
+        annualized_return = self._annualize(self.stats["Return [%]"] / 100)
+        
+        sharpe_ratio = (annualized_return - self.risk_free_return) / s
 
         return sharpe_ratio
     
     
     
-    def sortino_ratio(self, column_name):
+    def sortino_ratio(self):
         
         
         portfolio_returns = self.trades["ReturnPct"] + 1
@@ -43,7 +59,9 @@ class Risk_Metrics():
         if s == 0:
             return 0
         
-        sortino_ratio = (self.stats["Return [%]"] / 100 - self.risk_free_return) / s
+        annualized_return = self._annualize(self.stats["Return [%]"] / 100)
+        
+        sortino_ratio = (annualized_return - self.risk_free_return) / s
         
         return sortino_ratio
     
