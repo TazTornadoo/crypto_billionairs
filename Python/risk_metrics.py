@@ -10,6 +10,7 @@ class Risk_Metrics():
         self.ohlcv_data = ohlcv_data
         self.risk_free_return = risk_free_return
         self.stats = stats
+        self.equity_curve = stats["_equity_curve"].reset_index()
         
     
     def _annualize(self, total_return):
@@ -33,7 +34,6 @@ class Risk_Metrics():
         portfolio_returns = [x for x in portfolio_returns if isinstance(x, str) != True]
 
         s = statistics.stdev(portfolio_returns)
-        
         
         annualized_return = self._annualize(self.stats["Return [%]"] / 100)
         
@@ -68,21 +68,23 @@ class Risk_Metrics():
     
     def max_drawdown(self):
         
-        portfolio_return = np.cumprod(self.trades["ReturnPct"] + 1)
-        
-        peak, peak_index = portfolio_return.max(), portfolio_return.argmax()
-        
-        low = portfolio_return[peak_index:].min()
-        
-        max_drawdown = (peak - low)/peak
+        peak = self.equity_curve["Equity"].max()
+        peak_index = self.equity_curve["Equity"].idxmax()
+        low = self.equity_curve["Equity"].iloc[peak_index:].min()
+
+        max_drawdown = (low - peak)/peak
         
         return max_drawdown
     
     def calmar_ratio(self):
         
-        if self.max_drawdown() > 0:
-            calmar_ratio_ = (self.stats["Return [%]"] / 100 - self.risk_free_return) / self.max_drawdown()
+        mdd = self.max_drawdown() * -1
+        if mdd != 0:
+            annualized_return = self._annualize(self.stats["Return [%]"] / 100)
+            calmar_ratio_ = (annualized_return- self.risk_free_return) / mdd
 
             return calmar_ratio_
         
-        return 0
+        else:
+            return 0
+        
