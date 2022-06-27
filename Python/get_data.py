@@ -8,7 +8,7 @@ import time
 
 #maybe write as a class with trading_pair and db connection as initialisation parameters
 def download_binance_data(price_type, granularity, trading_pair, time_interval, history_days, path, db_connection):
-    #to make this function more efficient we should check if a table with this data already exist
+    #this function downloads the trading data of binance
 
     for history_day in range(1, history_days + 1):
 
@@ -42,6 +42,7 @@ def download_binance_data(price_type, granularity, trading_pair, time_interval, 
 
   
 def load_data_to_database(path, db_connection, header_list):
+    #this function loads the data of a zip file into the database as a table and removes the zip file
 
     
     for file in os.listdir(path):
@@ -58,6 +59,8 @@ def load_data_to_database(path, db_connection, header_list):
 
 
 def union_tables(trading_pair, time_interval, db_connection):
+    
+    #this function unions daily trading data to one bigger table
 
     table_names = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;", db_connection)
 
@@ -68,7 +71,6 @@ def union_tables(trading_pair, time_interval, db_connection):
 
     union_all_sql_list = []
 
-#Rewrite as list comprehension
     for name in filtered_table_names[:-1]:
         if trading_pair in name and 'history' not in name:
             union_new_table = f'SELECT * FROM {name} UNION ALL'
@@ -77,16 +79,11 @@ def union_tables(trading_pair, time_interval, db_connection):
     union_all_sql_list.append(f'SELECT * from {filtered_table_names[-1]}')
 
     union_all_sql = ' '.join(union_all_sql_list)
-
-#Potentially ineffiecent, might be worth trying to use only SQL and not loading into a dataframe first
+    
     df = pd.read_sql_query(union_all_sql, db_connection)
 
     df.to_sql(f'{trading_pair}_{time_interval}_complete_history', con=db_connection, if_exists="replace", index=False)
     
-
-#def create_rolled_window_dataset(table_name_history, ):   
-
-
 
 download_binance_data("spot", "daily", "ETHUSDT", "5m", 450, "Data/raw_data", connection)
 

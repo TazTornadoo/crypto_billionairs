@@ -3,18 +3,9 @@ import os
 
 
 def create_connection(db_name):
-    """create a database connection to the SQLite database specified by db_name
-    Parameters
-    ----------
-    db_name: str
-        database name
-    Returns
-    -------
-    c: connection object
-        conn.cursor
-    conn: connection
-        direct connect to database
-    """
+    # this function requires a name parameter to create the database
+    #calling the function with the name of an existing database enables the access to the database
+
     conn = sqlite3.connect(db_name, check_same_thread=False)
 
     return conn

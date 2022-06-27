@@ -4,6 +4,9 @@ import statistics
 
 
 class Risk_Metrics():
+    
+    #the class requires the trades of the backtest, the market data of the backtest,
+    #the risk free return rate and lastly a stats object which is created by a backtest
 
     def __init__(self, trades, ohlcv_data, risk_free_return, stats):
         self.trades = trades 
@@ -15,6 +18,7 @@ class Risk_Metrics():
     
     def _annualize(self, total_return):
         
+        # annualizes the total return of the backtest
         if total_return < 0:
             total_return = total_return * -1
             annualized_return = total_return ** (1 / (len(self.ohlcv_data) / 365 ))
@@ -27,7 +31,7 @@ class Risk_Metrics():
         return annualized_return 
     
     def sharpe_ratio(self):
-        
+        #returns the sharpe ratio of the backtest
         
         portfolio_returns = self.trades["ReturnPct"] + 1
         
@@ -44,7 +48,7 @@ class Risk_Metrics():
     
     
     def sortino_ratio(self):
-        
+        #returns the sortino ratio of the backtest
         
         portfolio_returns = self.trades["ReturnPct"] + 1
 
@@ -67,6 +71,7 @@ class Risk_Metrics():
     
     
     def max_drawdown(self):
+        #returns the maximum drawdown of the backtest
         
         peak = self.equity_curve["Equity"].max()
         peak_index = self.equity_curve["Equity"].idxmax()
@@ -77,6 +82,7 @@ class Risk_Metrics():
         return max_drawdown
     
     def calmar_ratio(self):
+        #returns the calmar ratio of the backtest
         
         mdd = self.max_drawdown() * -1
         if mdd != 0:
