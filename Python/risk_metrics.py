@@ -36,6 +36,9 @@ class Risk_Metrics():
         portfolio_returns = self.trades["ReturnPct"] + 1
         
         portfolio_returns = [x for x in portfolio_returns if isinstance(x, str) != True]
+        
+        if len(portfolio_returns) == 0:
+            return 0
 
         s = statistics.stdev(portfolio_returns)
         
